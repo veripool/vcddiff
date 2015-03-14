@@ -1,0 +1,42 @@
+# DESCRIPTION: DOCUMENT source run through perl to produce README file
+# Use 'make README' to produce the output file
+
+=pod
+
+=head1 NAME
+
+vcddiff - Find differences in Verilog value change dump (VCD) files
+
+=head1 DISTRIBUTION
+
+https://github.com/veripool/vcddiff
+
+Copyright (c) 2002-2004 Pragmatic C Software Corp.  All Rights reserved.
+Licensed under the GNU General Public License (GPL).  See the 'COPYING'
+file for details.  NO WARRANTY provided.
+
+=head1 DESCRIPTION
+
+This is a VCD (Verilog Value Change Dump) comparison tool, with only
+minimal changes based on the original version created by Pragmatic C
+Software Corp.
+
+This is used by Verilator's self tests; see:
+
+    http://www.veripool.org/verilator
+
+This version is currently intended to only provide the minimum functions
+needed for Verilator testing and remains as close to the original as
+possible.  Other applications will probably want a more full-featured
+version of vcddiff, see e.g.
+
+    https://github.com/palmer-dabbelt/vcddiff
+
+=head1 INSTALLATION
+
+    make
+    cp vcddiff /some/installation/directory   
+
+=head1 USAGE
+
+    See vcddiff --help
