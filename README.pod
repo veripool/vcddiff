@@ -23,19 +23,20 @@ Software Corp.
 
 This is used by Verilator's self tests; see:
 
-    http://www.veripool.org/verilator
+http://www.veripool.org/verilator
 
 This version is currently intended to only provide the minimum functions
 needed for Verilator testing and remains as close to the original as
 possible.  Other applications will probably want a more full-featured
 version of vcddiff, see e.g.
 
-    https://github.com/palmer-dabbelt/vcddiff
+https://github.com/palmer-dabbelt/vcddiff
 
 =head1 INSTALLATION
 
     make
-    cp vcddiff /some/installation/directory   
+    # Copy the binary into a location of your choice
+    cp -p vcddiff /usr/local/bin/vcddiff
 
 =head1 USAGE
 
