@@ -1397,6 +1397,9 @@ static void print_help(void)
   printf("\tPrints the current state of variables, instead of\n \tthe default edge value. \n");
   printf(" --wrap  \n -w \n");
   printf("\tWraps the line, only used for default edge print values\n\tnot --state print messages. \n");
+
+  printf("\n");
+  print_header();
   exit(0);
 }
 
@@ -1461,7 +1464,7 @@ int main(int argc, char **argv)
   sig1_hdG = NULL;      
   sig2_hdG = NULL;      
 
-  print_header(); 
+  //print_header(); 
    if(argc < 2)
    {
      printf("ERROR - Usage: [options] 'file1' 'file2'\n");
