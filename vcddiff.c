@@ -55,7 +55,7 @@ static vtime_t get_time_diffs(FILE *, FILE *, char *, char *, long, long,
 	          vtime_t, vtime_t, bool_t);
 static void print_map(void);
 static void compare_types(char *, char *, struct signal_t *, struct signal_t *);
-static bool_t map(char *, char *, int **, struct signal_t *,
+static bool_t map(char *, char *, int *, struct signal_t *,
                    struct signal_t *, struct signal_t **, bool_t);
 static bool_t map_var_names(char *, char *);
 static void run_diffs(FILE *, FILE *, char *, char *, long, long);
@@ -72,8 +72,8 @@ static bool_t state_flagG; /* print edges or states */
 static bool_t wrap_flagG; /* print edges or states */
 static struct signal_t	**sig_int1G;  /* int codes for file 1 */
 static struct signal_t	**sig_int2G;	/* int codes for file 2 */
-static int **fd1_to_fd2_mapG;   /* mappings from one file to the other*/
-static int **fd2_to_fd1_mapG;
+static int *fd1_to_fd2_mapG;   /* mappings from one file to the other*/
+static int *fd2_to_fd1_mapG;
 static int max_codeG;         /* max code so sig_int? is large enough */
 static char scopesG[MAXSCOPES][MAXSIG];  /* scope of mods */
 static int  quit_flagG;    /* flag to quit */
@@ -1013,13 +1013,13 @@ static bool_t peek_nxt_sig(FILE *fp, int sigcode1, bool_t isone)
   if(sigcode2 > max_codeG) return(TRUE);
   if(isone)
   {
-    if(fd2_to_fd1_mapG[sigcode2] == NULL) return(TRUE);
-    sigcode2 = *fd2_to_fd1_mapG[sigcode2];
+    if(fd2_to_fd1_mapG[sigcode2] == -1) return(TRUE);
+    sigcode2 = fd2_to_fd1_mapG[sigcode2];
   }
   else
   {
-    if(fd1_to_fd2_mapG[sigcode2] == NULL) return(TRUE);
-    sigcode2 = *fd1_to_fd2_mapG[sigcode2];
+    if(fd1_to_fd2_mapG[sigcode2] == -1) return(TRUE);
+    sigcode2 = fd1_to_fd2_mapG[sigcode2];
   }
 
   return(sigcode1 != sigcode2);
@@ -1092,13 +1092,13 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
       if(isone)
       {
         sig1 = VERILOG_POS_TO_SIG1(sigcode1);
-        sigcode1 = *fd1_to_fd2_mapG[sigcode1];
+        sigcode1 = fd1_to_fd2_mapG[sigcode1];
         sig2 = VERILOG_POS_TO_SIG2(sigcode1);
       }
       else
       {
         sig1 = VERILOG_POS_TO_SIG2(sigcode1);
-        sigcode1 = *fd2_to_fd1_mapG[sigcode1];
+        sigcode1 = fd2_to_fd1_mapG[sigcode1];
         sig2 = VERILOG_POS_TO_SIG1(sigcode1);
       }
       if(!sig1->in_both)
@@ -1185,22 +1185,22 @@ static void print_map(void)
 
    for(i = 0; i< max_codeG; i++)
    {
-    if(fd1_to_fd2_mapG[i] != NULL)
+    if(fd1_to_fd2_mapG[i] != -1)
     {
-        sig = VERILOG_POS_TO_SIG2(*fd1_to_fd2_mapG[i]);
+        sig = VERILOG_POS_TO_SIG2(fd1_to_fd2_mapG[i]);
 	if(!sig->in_both) continue;
-	printf("%d %d %s\n", i, *fd1_to_fd2_mapG[i], sig->signame);
+	printf("%d %d %s\n", i, fd1_to_fd2_mapG[i], sig->signame);
 
     }
    }
    printf("*********Second*********\n");
    for(i = 0; i< max_codeG; i++)
    {
-    if(fd2_to_fd1_mapG[i] != NULL)
+    if(fd2_to_fd1_mapG[i] != -1)
      {
-        sig = VERILOG_POS_TO_SIG1(*fd2_to_fd1_mapG[i]);
+        sig = VERILOG_POS_TO_SIG1(fd2_to_fd1_mapG[i]);
 	if(!sig->in_both) continue;
-	printf("%d %d %s\n", i, *fd2_to_fd1_mapG[i], sig->signame);
+	printf("%d %d %s\n", i, fd2_to_fd1_mapG[i], sig->signame);
 
      }
    }
@@ -1248,7 +1248,7 @@ static void compare_types(char *file_nam1, char *file_nam2,
 }
 
 /* map the signal names to identifiers from one file to the other */
-static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
+static bool_t map(char *file_nam1, char *file_nam2, int *file_map,
                      struct signal_t *startsig, struct signal_t *otherstart,
                      struct signal_t **sig_arr, bool_t isone)
 {
@@ -1271,7 +1271,7 @@ static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
            if(!sig2->in_both) continue;
            if(strcmp(sig1->signame, sig2->signame) == 0)
            {
-              file_map[sig1->sig_code] = (int*)&sig2->sig_code;
+              file_map[sig1->sig_code] = sig2->sig_code;
               compare_types(file_nam1, file_nam2, sig1, sig2);
               one_found = TRUE;
               break;
@@ -1280,7 +1280,7 @@ static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
     }
     else if(strcmp(sig1->signame, sig2->signame) == 0)
     {
-        file_map[sig1->sig_code] = (int*)&sig1->sig_code;
+        file_map[sig1->sig_code] = sig1->sig_code;
         compare_types(file_nam1, file_nam2, sig1, sig2);
         one_found = TRUE;
     }
@@ -1291,7 +1291,7 @@ static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
            if(!sig2->in_both) continue;
            if(strcmp(sig1->signame, sig2->signame) == 0)
            {
-              file_map[sig1->sig_code] = (int*)&sig2->sig_code;
+              file_map[sig1->sig_code] = sig2->sig_code;
               compare_types(file_nam1, file_nam2, sig1, sig2);
               one_found = TRUE;
               break;
@@ -1302,7 +1302,7 @@ static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
     {
        printf("WARNING - Ignoring signal %s (%s) - not defined in both files\n", sig1->signame, sig1->ident);
        printf("\t  Defined in file '%s' and not file '%s'\n\n", file_nam1, file_nam2);
-       file_map[sig1->sig_code] = (int*)&sig1->sig_code;
+       file_map[sig1->sig_code] = sig1->sig_code;
        sig1->in_both = FALSE;
     }
  }
@@ -1313,11 +1313,13 @@ static bool_t map(char *file_nam1, char *file_nam2, int **file_map,
 /* map both files */
 static bool_t map_var_names(char *file_nam1, char *file_nam2)
 {
-  fd1_to_fd2_mapG = (int**) malloc(sizeof(int) * max_codeG);
-  fd2_to_fd1_mapG = (int**) malloc(sizeof(int) * max_codeG);
+  fd1_to_fd2_mapG = (int*) malloc(sizeof(int) * max_codeG);
+  memset(fd1_to_fd2_mapG, -1, max_codeG);
+
+  fd2_to_fd1_mapG = (int*) malloc(sizeof(int) * max_codeG);
+  memset(fd2_to_fd1_mapG, -1, max_codeG);
 
   map(file_nam1, file_nam2, fd1_to_fd2_mapG, sig1_hdG, sig2_hdG, sig_int1G, TRUE);
-
    return(map(file_nam2, file_nam1, fd2_to_fd1_mapG, sig2_hdG, sig1_hdG, sig_int2G, FALSE));
 
   //print_map();
