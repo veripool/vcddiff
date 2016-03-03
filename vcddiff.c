@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <assert.h>
 #include "vcddiff.h"
 
 static int get_token(FILE *, char *);
@@ -123,13 +124,16 @@ static int get_token(FILE *fp, char *token)
  if(c == EOF) return EOF;
  token[i++] = c;
 
- while(!isspace(c = fgetc(fp)))
+ while(!isspace(c = fgetc(fp)) && i < MAXTOKSIZE)
  {
    if(c == EOF)
  	 return EOF;
    else
      token[i++] = c;
  }
+
+ assert(i < MAXTOKSIZE);
+
  if(c == '\n')
  {
     if(fp == file1G) line_num1G++;
@@ -163,6 +167,8 @@ static char timescale(FILE *fp, int *tnum)
  char *tok;
 
     toklen = get_token(fp, token);
+    assert(toklen < MAXTOKSIZE);
+
     tok = token;
     /* AIV 02/04/03 there can be a space between 1 ns, not always 1ns */
     for(i = 0; i <toklen; i++)
@@ -343,12 +349,12 @@ static void variable(FILE *fp, char *file_name)
 
     /*identifier*/
     get_token(fp, token);
-    strcpy(ident, token);
+    strncpy(ident, token, sizeof(ident));
 
     /*variable name*/
     get_token(fp, token);
-    strcpy (signame, curmodG);
-    strcat (signame, token);
+    strncpy(signame, curmodG, MAXSIG);
+    strcat(signame, token);
 
 
     get_token(fp, token);
@@ -919,7 +925,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
         /* vector or real cases */
 	case 'b':
 	case 'r':
-	    strcpy(value, line);
+	    strncpy(value, line, MAXTOKSIZE);
 	    get_token(fp, token);
 	    *sigcode = VERILOG_ID_TO_POS(token);
 	    if(isone)
@@ -1044,7 +1050,7 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
                            vtime_t ltime1, vtime_t ltime2, bool_t isone)
 {
   char svalue1[MAXTOKSIZE], svalue2[MAXTOKSIZE];
-  int retval;
+  int retval = 0;
   int sigcode1, sigcode2;
   int  state1, state2;
   int tmpline1, tmpline2;
@@ -1332,7 +1338,7 @@ static void run_diffs(FILE *fp1, FILE *fp2, char *fnam1, char *fnam2,
 {
  vtime_t time1, time2, temp_time1;
  long temp1_chars;
- char token[MAXTOKSIZE];;
+ char token[MAXTOKSIZE];
 
   time1 = time2 = temp_time1 = 0;
 
