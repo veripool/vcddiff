@@ -812,7 +812,6 @@ static void print_vector_edge(struct signal_t *sig1,
  int size1, size2;
  int vsize1, vsize2;
  int max1, max2;
- char dirc;
 
    if(time1 == time2)
    {
@@ -853,6 +852,8 @@ static void print_vector_edge(struct signal_t *sig1,
    }
    else
    {
+	 char dirc;
+
 	 if(sig1->type == REAL)
 	 {
             print_vector_state(sig1, sig2, time1, time2, sval1, sval2, isone);
@@ -988,7 +989,7 @@ static void restore(FILE *fp, char *str, int size)
 static bool_t peek_nxt_sig(FILE *fp, int sigcode1, bool_t isone)
 {
   char tmp[MAXTOKSIZE], sig[MAXTOKSIZE];
-  int size1, size2, sigcode2;
+  int size1, sigcode2;
   char *cp;
 
   size1 = get_token(fp, tmp);
@@ -996,6 +997,7 @@ static bool_t peek_nxt_sig(FILE *fp, int sigcode1, bool_t isone)
 
   if(tmp[0] == 'b')
   {
+   int size2;
    size2 = get_token(fp, sig);
    restore(fp, sig, size2);
    restore(fp, tmp, size1);
@@ -1261,6 +1263,7 @@ static bool_t map(char *file_nam1, char *file_nam2, int *file_map,
   struct signal_t *sig1, *sig2;
   bool_t one_found;
 
+  if (sig_arr) {}  // UNUSED
 
   one_found = FALSE;
   for(sig1 = startsig; sig1 != NULL; sig1 = sig1->next)
@@ -1325,11 +1328,12 @@ static bool_t map_var_names(char *file_nam1, char *file_nam2)
   fd2_to_fd1_mapG = (int*) malloc(sizeof(int) * max_codeG);
   memset(fd2_to_fd1_mapG, -1, max_codeG);
 
+  if (0) {
+    print_map();
+  }
+
   map(file_nam1, file_nam2, fd1_to_fd2_mapG, sig1_hdG, sig2_hdG, sig_int1G, TRUE);
-   return(map(file_nam2, file_nam1, fd2_to_fd1_mapG, sig2_hdG, sig1_hdG, sig_int2G, FALSE));
-
-  //print_map();
-
+  return(map(file_nam2, file_nam1, fd2_to_fd1_mapG, sig2_hdG, sig1_hdG, sig_int2G, FALSE));
 }
 
 /* acutally run the files to diff the two */
