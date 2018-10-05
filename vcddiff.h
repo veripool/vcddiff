@@ -30,24 +30,34 @@
 #define REALSIZE 60
 
 /*var types*/
-#define EVENT 0
-#define INTEGER 1
-#define PARAMETER 2
-#define REAL 3
-#define REG 4
-#define SUPPLY0 5
-#define SUPPLY1 6
-#define TIME 7
-#define TRI 8
-#define TRI0 9
-#define TRI1 10
-#define TRIAND 11
-#define TRIOR 12
-#define TRIREG 13
-#define WAND 14
-#define WIRE 15
-#define WOR 16
-#define UNDEFINED 17
+#define BIT 0
+#define BYTE 1
+#define EVENT 2
+#define INT 3
+#define INTEGER 4
+#define LOGIC 5
+#define LONGINT 6
+#define PARAMETER 7
+#define PORT 8
+#define REAL 9
+#define REAL_PARAMETER 10
+#define REALTIME 11
+#define REG 12
+#define SHORTINT 13
+#define SUPPLY0 14
+#define SUPPLY1 15
+#define TIME 16
+#define TRI 17
+#define TRI0 18
+#define TRI1 19
+#define TRIAND 20
+#define TRIOR 21
+#define TRIREG 22
+#define WAND 23
+#define WIRE 24
+#define WOR 25
+
+#define UNDEFINED 26
 
 
 /*dumpfile key words*/

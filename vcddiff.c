@@ -16,7 +16,7 @@
   59 Temple Place, Suite 330, Boston, MA, 02111-1307.
 */
 
-#define VERS2 "0.04a"
+#define VERS2 "0.04b"
 #define OFDT "07/28/2004"
 
 #include <stdio.h>
@@ -269,12 +269,22 @@ static void add_signal(char *signame,char *ident, unsigned int code,
 
 
 /*dump variable types must be kept in alphabetical order */
+/*Values must match the var type #defines in vcddiff.h */
 static struct variable_types_t var_types[] = {
-	{"event", EVENT },
+        {"bit", BIT},  // GTKWave's fst2vcd
+        {"byte", BYTE},  // GTKWave's fst2vcd
+        {"event", EVENT },
+        {"int", INT},  // GTKWave's fst2vcd
         {"integer", INTEGER},
+        {"logic", LOGIC},  // GTKWave's fst2vcd
+        {"longint", LONGINT},  // GTKWave's fst2vcd
         {"parameter", PARAMETER},
+        {"port", PORT},  // GTKWave's fst2vcd
         {"real", REAL},
+        {"real_parameter", REAL},  // GTKWave's fst2vcd, handle as if real
+        {"realtime", REALTIME},  // GTKWave's fst2vcd
         {"reg", REG},
+        {"shortint", SHORTINT},  // GTKWave's fst2vcd
         {"supply0", SUPPLY0},
         {"supply1", SUPPLY1},
         {"time", TIME},
@@ -286,7 +296,7 @@ static struct variable_types_t var_types[] = {
         {"trireg", TRIREG},
         {"wand", WAND},
         {"wire", WIRE},
-        {"wor",	WOR}
+        {"wor", WOR}
 };
 
 
