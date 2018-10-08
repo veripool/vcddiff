@@ -61,15 +61,16 @@
 
 
 /*dumpfile key words*/
-#define V_COMMENT 1
-#define V_DATE 2
-#define V_END  3
-#define V_ENDDEF  4
-#define V_SCOPE    5
-#define V_TIMESCALE 6
-#define V_UPSCOPE  7
-#define V_VAR    8
-#define V_VERSION  9
+#define V_ATTRBEGIN 1
+#define V_COMMENT 2
+#define V_DATE 3
+#define V_END  4
+#define V_ENDDEF  5
+#define V_SCOPE    6
+#define V_TIMESCALE 7
+#define V_UPSCOPE  8
+#define V_VAR    9
+#define V_VERSION  10
 
 #  define MAX(a,b) ((a  > b ) ?  a  :  b )
 

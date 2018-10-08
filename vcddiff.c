@@ -16,7 +16,7 @@
   59 Temple Place, Suite 330, Boston, MA, 02111-1307.
 */
 
-#define VERS2 "0.04b"
+#define VERS2 "0.04c-veripool"
 #define OFDT "07/28/2004"
 
 #include <stdio.h>
@@ -396,6 +396,7 @@ static void alloc_sig_mem(void)
 
 /*dump file keywords must be kept in alphabetical order */
 static struct variable_types_t vkeywds[] = {
+        { "attrbegin", V_ATTRBEGIN},  // GTKWave
         { "comment", V_COMMENT},
         { "date", V_DATE },
         { "end", V_END },
@@ -496,6 +497,7 @@ static long get_lines(FILE *fp, int *units, int *tnum, char *file_name)
 	       exit(0);
 	    }
           break;
+	case V_ATTRBEGIN:
         case V_COMMENT:
 	case V_DATE:
 	case V_VERSION:
