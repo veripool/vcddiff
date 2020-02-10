@@ -19,11 +19,9 @@ file for details.  NO WARRANTY provided.
 
 This is a VCD (Verilog Value Change Dump) comparison tool, with only
 minimal changes based on the original version created by Pragmatic C
-Software Corp.
+Software Corp to make it suitable for use by Verilator's self tests; see:
 
-This is used by Verilator's self tests; see:
-
-http://www.veripool.org/verilator
+http://verilator.org/verilator
 
 This version is currently intended to only provide the minimum functions
 needed for Verilator testing and remains as close to the original as
