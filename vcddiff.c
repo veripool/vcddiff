@@ -147,7 +147,7 @@ static int get_token(FILE *fp, char *token)
 /*read the file until an $end is reached*/
 static void read_to_end(FILE *fp)
 {
-  char token[MAXTOKSIZE];
+  static char token[MAXTOKSIZE];
 
     while(get_token(fp, token) != EOF)
     {
@@ -162,8 +162,8 @@ static void read_to_end(FILE *fp)
 static char timescale(FILE *fp, int *tnum)
 {
  int i, toklen;
- char token[MAXTOKSIZE];
- char tmp[MAXTOKSIZE];
+ static char token[MAXTOKSIZE];
+ static char tmp[MAXTOKSIZE];
  char *tok;
 
     toklen = get_token(fp, token);
@@ -326,7 +326,7 @@ static void variable(FILE *fp, char *file_name)
 {
   char signame[MAXSIG];
   char ident[10];
-  char token[MAXTOKSIZE];
+  static char token[MAXTOKSIZE];
   int  bits;
   char type;
 
@@ -440,7 +440,7 @@ static long get_lines(FILE *fp, int *units, int *tnum, char *file_name)
   int level;
   register int i;
   char *tok;
-  char token[MAXTOKSIZE];
+  static char token[MAXTOKSIZE];
 
     sep[0] = '.';
     sep[1] = '\0';
@@ -898,7 +898,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
                        char *value, vtime_t *time, bool_t isone)
 {
  char *line;
- char token[MAXTOKSIZE];
+ static char token[MAXTOKSIZE];
 
    while(get_token(fp, token) != EOF)
    {
@@ -1000,7 +1000,7 @@ static void restore(FILE *fp, char *str, int size)
 /* return true if the next signal isn't the same, otherwise false */
 static bool_t peek_nxt_sig(FILE *fp, int sigcode1, bool_t isone)
 {
-  char tmp[MAXTOKSIZE], sig[MAXTOKSIZE];
+  static char tmp[MAXTOKSIZE], sig[MAXTOKSIZE];
   int size1, sigcode2;
   char *cp;
 
@@ -1063,7 +1063,7 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
                            char *oname, long seek1, long seek2,
                            vtime_t ltime1, vtime_t ltime2, bool_t isone)
 {
-  char svalue1[MAXTOKSIZE], svalue2[MAXTOKSIZE];
+  static char svalue1[MAXTOKSIZE], svalue2[MAXTOKSIZE];
   int retval = 0;
   int sigcode1, sigcode2;
   int  state1, state2;
@@ -1354,7 +1354,7 @@ static void run_diffs(FILE *fp1, FILE *fp2, char *fnam1, char *fnam2,
 {
  vtime_t time1, time2, temp_time1;
  long temp1_chars;
- char token[MAXTOKSIZE];
+ static char token[MAXTOKSIZE];
 
   time1 = time2 = temp_time1 = 0;
 
