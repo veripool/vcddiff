@@ -1042,8 +1042,8 @@ static void restore(FILE *fp, char *str, int size)
 	 int r=ungetc(*cp, fp);
 	 if(r==EOF){
 		 //because ungetc implementations are not required to support
-		 //more than one call of it in a row, this sort of usage is 
-		 //fundamentally flawed.  
+		 //more than one call of it in a row, this sort of usage is
+		 //fundamentally flawed.
 		 printf("*** ERROR Failed using ungetc.  Aborting.\n");
 		 exit(1);
  	}
