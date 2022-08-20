@@ -22,5 +22,5 @@ README: README.pod
 	-rm -f $@
 	$(POD2TEXT) --loose $< > $@
 
-clean:
+clean distclean:
 	-rm -rf README vcddiff vcddiff.o
