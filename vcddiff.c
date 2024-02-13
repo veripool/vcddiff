@@ -71,6 +71,7 @@ static char curmodG[1000]; /* cur mod hier name */
 static FILE *file1G;   /* to check if it is the first file */
 static bool_t state_flagG; /* print edges or states */
 static bool_t wrap_flagG; /* print edges or states */
+static bool_t extended_flagG; /* parse extended VCD format */
 static struct signal_t	**sig_int1G;  /* int codes for file 1 */
 static struct signal_t	**sig_int2G;	/* int codes for file 2 */
 static int *fd1_to_fd2_mapG;   /* mappings from one file to the other*/
@@ -84,7 +85,9 @@ struct signal_t *sig2_hdG;   /* the head of the second file of signals */
 struct signal_t *lastsigG;   /* mark the last signal of the file */
 
 /* signal to code from dinotrace wave viewer www.veripool.org/dinotrace */
+/*extended vcd converted, removes '<' */
 #define	VERILOG_ID_TO_POS(_code_) \
+    extended_flagG ?  atoi(&_code_[1]) : \
     (_code_[0]?((_code_[0]-32) + 94 * \
 		(_code_[1]?((_code_[1]-32) + 94 * \
 			    (_code_[2]?((_code_[2]-32) + 94 * \
@@ -92,7 +95,7 @@ struct signal_t *lastsigG;   /* mark the last signal of the file */
 						    ):0) \
 					):0) \
 			    ):0) \
-		):0)
+		):0) 
 
 #define VERILOG_POS_TO_SIG1(_pos_) \
     (((unsigned)(_pos_)<(unsigned)max_codeG)?sig_int1G[(_pos_)]:0)
@@ -333,7 +336,7 @@ static int get_var_type(char *tstr)
 static void variable(FILE *fp, char *file_name)
 {
   char signame[MAXSIG];
-  char ident[11];
+  char ident[MAXIDLENGTH];
   static char token[MAXTOKSIZE];
   int  bits;
   char type;
@@ -941,6 +944,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
                        char *value, vtime_t *time, bool_t isone)
 {
  char *line;
+ char * separator;
  static char token[MAXTOKSIZE];
 
    while(get_token(fp, token) != EOF)
@@ -956,9 +960,46 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
 	case 'Z':
 	case 'x':
 	case 'X':
+   if (extended_flagG) {
+      /*parsing the eVCD*/
+      separator =strpbrk(token, "<" ); // get the separator
+
+      if (separator == NULL)
+      {
+        printf("Unknown Identifier not found '%s' in file %d '%s' on line %d\n",
+		  line, isone ? 1 : 2, fname,
+	        isone ? line_num1G : line_num2G );
+	     continue;
+      } else  if(separator-line>1){
+          /*it is a vector*/
+            line--;
+            get_token(fp, token);
+            strncpy(value, line, separator-line);
+      	    *sigcode = VERILOG_ID_TO_POS(separator);
+      	    if(isone)
+      	    {
+      	       if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
+      	       {
+                       printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
+      		        line, isone ? 1 : 2, fname,
+      		        isone ? line_num1G : line_num2G );
+      	       continue;
+      	       }
+      	    }
+      	    else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
+      	    {
+                       printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
+      		        line, isone ? 1 : 2, fname,
+      		        isone ? line_num1G : line_num2G );
+      		 continue;
+      	    }
+      	    return(VECTOR);
+
+        } 
+    } 
           *bit = *(line-1);
           *sigcode = VERILOG_ID_TO_POS(line);
-
+    
          if(isone)
          {
            if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
@@ -1492,6 +1533,8 @@ static void print_help(void)
   printf("\tPrints the current state of variables, instead of\n \tthe default edge value. \n");
   printf(" --wrap  \n -w \n");
   printf("\tWraps the line, only used for default edge print values\n\tnot --state print messages. \n");
+  printf(" --extended  \n -e \n");
+  printf("\tConsider files as extended VCD format.\n\t \n");
 
   printf("\n");
   print_header();
@@ -1535,6 +1578,9 @@ static void set_options(int argc, char **argv)
         printf("WARNING - wrap cannot be used with --state option, wrap disabled\n\n");
       else
         wrap_flagG = TRUE;
+   }
+   else if (!strcmp(argv[i],"--extended") || !strcmp(argv[i],"-e")){
+       extended_flagG = TRUE; 
    }
    else
    {
