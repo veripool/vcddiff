@@ -999,7 +999,6 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
     } 
           *bit = *(line-1);
           *sigcode = VERILOG_ID_TO_POS(line);
-    
          if(isone)
          {
            if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
