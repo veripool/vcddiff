@@ -971,7 +971,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
 	        isone ? line_num1G : line_num2G );
 	     continue;
       } else  if(separator-line>1){
-          /*it is a vector*/
+            /*it is a vector*/
             line--;
             get_token(fp, token);
             strncpy(value, line, separator-line);
