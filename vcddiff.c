@@ -95,7 +95,7 @@ struct signal_t *lastsigG;   /* mark the last signal of the file */
 						    ):0) \
 					):0) \
 			    ):0) \
-		):0) 
+		):0)
 
 #define VERILOG_POS_TO_SIG1(_pos_) \
     (((unsigned)(_pos_)<(unsigned)max_codeG)?sig_int1G[(_pos_)]:0)
