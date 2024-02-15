@@ -964,7 +964,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
       /*parsing the eVCD*/
       separator =strpbrk(token, "<" ); // get the separator
 
-      if (separator == NULL)
+      if (!separator)
       {
         printf("Unknown Identifier not found '%s' in file %d '%s' on line %d\n",
 		  line, isone ? 1 : 2, fname,
