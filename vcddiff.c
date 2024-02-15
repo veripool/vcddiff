@@ -87,7 +87,7 @@ struct signal_t *lastsigG;   /* mark the last signal of the file */
 /* signal to code from dinotrace wave viewer www.veripool.org/dinotrace */
 /*extended vcd converted, removes '<' */
 #define	VERILOG_ID_TO_POS(_code_) \
-    extended_flagG ?  atoi(&_code_[1]) : \
+    (extended_flagG && _code_[0]=='<') ? atoi(_code_ + 1) : \
     (_code_[0]?((_code_[0]-32) + 94 * \
 		(_code_[1]?((_code_[1]-32) + 94 * \
 			    (_code_[2]?((_code_[2]-32) + 94 * \
