@@ -994,7 +994,6 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
       		 continue;
       	    }
       	    return(VECTOR);
-
         } 
     } 
           *bit = *(line-1);
