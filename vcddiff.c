@@ -71,6 +71,7 @@ static char curmodG[1000]; /* cur mod hier name */
 static FILE *file1G;   /* to check if it is the first file */
 static bool_t state_flagG; /* print edges or states */
 static bool_t wrap_flagG; /* print edges or states */
+static bool_t extended_flagG; /* parse extended VCD format */
 static struct signal_t	**sig_int1G;  /* int codes for file 1 */
 static struct signal_t	**sig_int2G;	/* int codes for file 2 */
 static int *fd1_to_fd2_mapG;   /* mappings from one file to the other*/
@@ -359,7 +360,17 @@ static void variable(FILE *fp, char *file_name)
       type = UNDEFINED;
       printf("Error- Unknown variable type %s\n", token);
     }
-
+    /*according to the std ieee verilog 
+      if it is port is an evcd (port not allowed in vcd for signal declaration)
+    */
+    if(extended_flagG == FALSE && strncmp(token,"port",4)==0)
+    {
+      extended_flagG = TRUE ;
+      
+    } else if (extended_flagG && strncmp(token,"port",4)!=0) {
+      /*parsing an evcd file but encountered in a non standard definition*/
+      printf("Error - Unknown variable type for EVCD standard %s\n", token);
+    }
     /* get number of bits */
     /* AIV FIXME error recovery should be used here for invalid tokens
      * if a $var line is short vars (starts with a '$') rewind, print
@@ -1583,9 +1594,7 @@ static void set_options(int argc, char **argv)
 
 }
 
-/*according to the std ieee verilog if it is port is an evcd (port not allowed in vcd)
-no need to check dumpports or dumpvars
-*/
+
 int main(int argc, char **argv)
 {
    int unit1, unit2, tnum1, tnum2;
@@ -1594,6 +1603,7 @@ int main(int argc, char **argv)
    bool_t map_found;
    FILE *fp1, *fp2;
 
+  extended_flagG = FALSE;
   quit_flagG = FALSE;
   sig1_hdG = NULL;
   sig2_hdG = NULL;
