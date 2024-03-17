@@ -71,7 +71,6 @@ static char curmodG[1000]; /* cur mod hier name */
 static FILE *file1G;   /* to check if it is the first file */
 static bool_t state_flagG; /* print edges or states */
 static bool_t wrap_flagG; /* print edges or states */
-static bool_t extended_flagG; /* parse extended VCD format */
 static struct signal_t	**sig_int1G;  /* int codes for file 1 */
 static struct signal_t	**sig_int2G;	/* int codes for file 2 */
 static int *fd1_to_fd2_mapG;   /* mappings from one file to the other*/
@@ -87,7 +86,7 @@ struct signal_t *lastsigG;   /* mark the last signal of the file */
 /* signal to code from dinotrace wave viewer www.veripool.org/dinotrace */
 /*extended vcd converted, removes '<' */
 #define	VERILOG_ID_TO_POS(_code_) \
-    (extended_flagG && _code_[0]=='<') ? atoi(_code_ + 1) : \
+    strpbrk(_code_, "<" ) ? atoi(_code_+1) : \
     (_code_[0]?((_code_[0]-32) + 94 * \
 		(_code_[1]?((_code_[1]-32) + 94 * \
 			    (_code_[2]?((_code_[2]-32) + 94 * \
@@ -960,10 +959,9 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
 	case 'Z':
 	case 'x':
 	case 'X':
-   if (extended_flagG) {
-      /*parsing the eVCD*/
+  
+      /*check if it contains '<', if true parsing the eVCD*/
       separator =strpbrk(token, "<" ); // get the separator
-
       if (!separator)
       {
         printf("Unknown Identifier not found '%s' in file %d '%s' on line %d\n",
@@ -995,7 +993,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
       	    }
       	    return(VECTOR);
         } 
-    } 
+        /*otherwise vcd*/
           *bit = *(line-1);
           *sigcode = VERILOG_ID_TO_POS(line);
          if(isone)
@@ -1531,8 +1529,6 @@ static void print_help(void)
   printf("\tPrints the current state of variables, instead of\n \tthe default edge value. \n");
   printf(" --wrap  \n -w \n");
   printf("\tWraps the line, only used for default edge print values\n\tnot --state print messages. \n");
-  printf(" --extended  \n -e \n");
-  printf("\tConsider files as extended VCD format.\n\t \n");
 
   printf("\n");
   print_header();
@@ -1577,9 +1573,6 @@ static void set_options(int argc, char **argv)
       else
         wrap_flagG = TRUE;
    }
-   else if (!strcmp(argv[i],"--extended") || !strcmp(argv[i],"-e")){
-       extended_flagG = TRUE; 
-   }
    else
    {
      printf("ERROR - Unknown option %s\n", argv[i]);
@@ -1590,7 +1583,9 @@ static void set_options(int argc, char **argv)
 
 }
 
-
+/*according to the std ieee verilog if it is port is an evcd (port not allowed in vcd)
+no need to check dumpports or dumpvars
+*/
 int main(int argc, char **argv)
 {
    int unit1, unit2, tnum1, tnum2;
