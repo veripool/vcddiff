@@ -40,7 +40,7 @@ static void alloc_sig_mem(void);
 static int get_vkeywrd(register char *);
 static long get_lines(FILE *, int *, int *, char *);
 static void print_signal_info(struct signal_t *, struct signal_t *, vtime_t,
-		vtime_t, bool_t);
+    vtime_t, bool_t);
 static void print_scalar_state(struct signal_t *, struct signal_t *, vtime_t,
                 vtime_t, char, char, bool_t);
 static void print_vector_state(struct signal_t *, struct signal_t *, vtime_t,
@@ -51,9 +51,9 @@ static void print_edges(struct signal_t *, char *, int, int, char);
 static void print_vector_edge(struct signal_t *, struct signal_t *, vtime_t,
                 vtime_t, char *, char *, bool_t);
 static int get_nxt_chg(FILE *, char *, int *, int *, char *, vtime_t *,
-		         bool_t);
+             bool_t);
 static vtime_t get_time_diffs(FILE *, FILE *, char *, char *, long, long,
-	          vtime_t, vtime_t, bool_t);
+            vtime_t, vtime_t, bool_t);
 static void print_map(void);
 static void compare_types(char *, char *, struct signal_t *, struct signal_t *);
 static bool_t map(char *, char *, int *, struct signal_t *,
@@ -89,13 +89,13 @@ struct signal_t *lastsigG;   /* mark the last signal of the file */
 #define	VERILOG_ID_TO_POS(_code_) \
     strpbrk(_code_, "<" ) ? atoi(_code_+1) : \
     (_code_[0]?((_code_[0]-32) + 94 * \
-		(_code_[1]?((_code_[1]-32) + 94 * \
-			    (_code_[2]?((_code_[2]-32) + 94 * \
-					(_code_[3]?((_code_[3]-32) \
-						    ):0) \
-					):0) \
-			    ):0) \
-		):0)
+    (_code_[1]?((_code_[1]-32) + 94 * \
+          (_code_[2]?((_code_[2]-32) + 94 * \
+          (_code_[3]?((_code_[3]-32) \
+                ):0) \
+          ):0) \
+          ):0) \
+    ):0)
 
 #define VERILOG_POS_TO_SIG1(_pos_) \
     (((unsigned)(_pos_)<(unsigned)max_codeG)?sig_int1G[(_pos_)]:0)
@@ -112,16 +112,16 @@ static int get_token(FILE *fp, char *token)
  i = 0;
  while((c = fgetc(fp)) != EOF)
  {
-	 if(isspace(c))
-	 {
+   if(isspace(c))
+   {
            if(c == '\n')
            {
-	     if(fp == file1G) line_num1G++;
-	     else line_num2G++;
-	   }
-		 continue;
+       if(fp == file1G) line_num1G++;
+       else line_num2G++;
+     }
+     continue;
          }
-	 break;
+   break;
  }
 
  if(c == EOF) return EOF;
@@ -130,7 +130,7 @@ static int get_token(FILE *fp, char *token)
  while(!isspace(c = fgetc(fp)) && i < MAXTOKSIZE)
  {
    if(c == EOF)
- 	 return EOF;
+    return EOF;
    else
      token[i++] = c;
  }
@@ -157,8 +157,8 @@ static void read_to_end(FILE *fp)
 
     while(get_token(fp, token) != EOF)
     {
-	if(!strncmp (token, "$end", 4))
-	    return;
+  if(!strncmp (token, "$end", 4))
+      return;
     }
 }
 
@@ -195,14 +195,14 @@ static char timescale(FILE *fp, int *tnum)
 
     if(*tnum != 1 && *tnum != 10 && *tnum != 100)
     {
-	    printf("*** ERROR-time number(%d) in timescale on line %d is illegal - assuming 1\n", *tnum, (fp == file1G) ? line_num1G : line_num2G );
-	    *tnum = 1;
+      printf("*** ERROR-time number(%d) in timescale on line %d is illegal - assuming 1\n", *tnum, (fp == file1G) ? line_num1G : line_num2G );
+      *tnum = 1;
     }
 
     while(isdigit (*tok))
-	    tok++;
+      tok++;
     if (!*tok)
-	    get_token(fp, token);
+      get_token(fp, token);
 
     switch (*tok) {
     case 's':
@@ -213,8 +213,8 @@ static char timescale(FILE *fp, int *tnum)
     case 'f':
       return(*tok);
     default:
-	  printf("*** ERROR-illegal character(%c) in timescale on line %d\n", *tok, (fp == file1G) ? line_num1G : line_num2G );
-	  return(0);
+    printf("*** ERROR-illegal character(%c) in timescale on line %d\n", *tok, (fp == file1G) ? line_num1G : line_num2G );
+    return(0);
     }
 }
 
@@ -351,7 +351,7 @@ static void variable(FILE *fp, char *file_name)
     }
     /*most ofter a reg otherwise do a search */
     if(strncmp(token, "reg", 3) == 0)
-	    type = REG;
+      type = REG;
     else
             type = get_var_type(token);
 
@@ -360,13 +360,13 @@ static void variable(FILE *fp, char *file_name)
       type = UNDEFINED;
       printf("Error- Unknown variable type %s\n", token);
     }
-    /*according to the std ieee verilog 
+    /*according to the std ieee verilog
       if it is port is an evcd (port not allowed in vcd for signal declaration)
     */
     if(extended_flagG == FALSE && strncmp(token,"port",4)==0)
     {
       extended_flagG = TRUE ;
-      
+
     } else if (extended_flagG && strncmp(token,"port",4)!=0) {
       /*parsing an evcd file but encountered in a non standard definition*/
       printf("Error - Unknown variable type for EVCD standard %s\n", token);
@@ -408,20 +408,20 @@ static void variable(FILE *fp, char *file_name)
     bzero(signame,MAXSIG);
     strncpy(signame, curmodG, MAXSIG-1);
     {
-	    int available=MAXSIG-1-strlen(signame);
-	    if(available>0){
-		    strncat(signame, token, available);
-	    }
+      int available=MAXSIG-1-strlen(signame);
+      if(available>0){
+        strncat(signame, token, available);
+      }
     }
 
     get_token(fp, token);
     /*if there is a space between the var name and the range concat it
      * to the name */
     if (token[0] != '$'){
-	int available=MAXSIG-1-strlen(signame);
-	if(available>0){
-		strncat (signame, token, available);
-	}
+  int available=MAXSIG-1-strlen(signame);
+  if(available>0){
+    strncat (signame, token, available);
+  }
     }
 
     add_signal(signame, ident, VERILOG_ID_TO_POS(ident), bits, type);
@@ -518,61 +518,61 @@ static long get_lines(FILE *fp, int *units, int *tnum, char *file_name)
         case V_END:
                 break;
 
-	case V_VAR:
-		 variable(fp, file_name);
-	      break;
+  case V_VAR:
+     variable(fp, file_name);
+        break;
 
         case V_UPSCOPE:
-	         if(level > 0) level--;
-	      break;
+           if(level > 0) level--;
+        break;
 
-	case V_SCOPE:
-	    get_token(fp, tok);
-	    get_token(fp, tok);
+  case V_SCOPE:
+      get_token(fp, tok);
+      get_token(fp, tok);
 
-	    if(level < MAXSCOPES)
+      if(level < MAXSCOPES)
             {
-		strcpy(scopesG[level], tok);
+    strcpy(scopesG[level], tok);
 
-	        strcpy(curmodG, scopesG[0]);
-	        strcat(curmodG, sep);
-		level++;
+          strcpy(curmodG, scopesG[0]);
+          strcat(curmodG, sep);
+    level++;
 
-		if(level)
-		{
+    if(level)
+    {
                   for (i=1; i<level; i++) {
-	             strcat(curmodG, scopesG[i]);
-	             strcat(curmodG, sep);
+               strcat(curmodG, scopesG[i]);
+               strcat(curmodG, sep);
                   }
-	        }
+          }
 
-	    }
-	    else
+      }
+      else
             {
-	       printf("*** ERROR-exceeded max scope levels %d\n", level);
-	       exit(0);
-	    }
+         printf("*** ERROR-exceeded max scope levels %d\n", level);
+         exit(0);
+      }
           break;
-	case V_ATTRBEGIN:
+  case V_ATTRBEGIN:
         case V_COMMENT:
-	case V_DATE:
-	case V_VERSION:
-	       read_to_end(fp);
-	     break;
+  case V_DATE:
+  case V_VERSION:
+         read_to_end(fp);
+       break;
 
         case V_TIMESCALE:
-		 *units = timescale(fp, tnum);
- 		 break;
+     *units = timescale(fp, tnum);
+      break;
 
         case V_ENDDEF:
-	    next_listG = TRUE;
-	    lastsigG = NULL;
-	    return(ftell(fp));
+      next_listG = TRUE;
+      lastsigG = NULL;
+      return(ftell(fp));
 
-	default:
-	    printf ("Unknown command '%s' on line %d of %s\n",
-		     tok, (fp == file1G) ? line_num1G: line_num2G, file_name);
-	    break;
+  default:
+      printf ("Unknown command '%s' on line %d of %s\n",
+         tok, (fp == file1G) ? line_num1G: line_num2G, file_name);
+      break;
 
     }
   }
@@ -623,15 +623,15 @@ static void print_scalar_state(struct signal_t *sig1,
       {
          print_signal_info(sig1, sig2, time1, time2, isone);
          printf("\t%c\n\t%c\n",state1, state2);
-	 return;
+   return;
       }
    }
   else
   {
          print_signal_info(sig1, sig2, time1, time2, isone);
          printf("%c #%lld \t%c\n", isone ? '>' : '<', time1, state1);
-	 printf("%c #%lld \t%c\n", isone ? '>' : '<', time2, state2);
-	      return;
+   printf("%c #%lld \t%c\n", isone ? '>' : '<', time2, state2);
+        return;
      }
 }
 
@@ -723,19 +723,19 @@ static void print_scalar_edge(struct signal_t *sig1,
           {
             print_signal_info(sig1, sig2, time1, time2, isone);
 
-	    if(sig1->state == state1)
+      if(sig1->state == state1)
                printf("\t(%c-)\n", state1);
-	    else
+      else
                printf("\t(%c%c)\n", sig1->state, state1);
-	    if(sig2->state == state2)
+      if(sig2->state == state2)
                printf("\t(%c-)\n", state2);
-	    else
+      else
                printf("\t(%c%c)\n", sig2->state, state2);
-	    return;
-	  }
-	 }
+      return;
+    }
+   }
          else
-	 {
+   {
            print_signal_info(sig1, sig2, time1, time2, isone);
 
            if(sig1->state == state1)
@@ -768,9 +768,9 @@ static void print_edges(struct signal_t *sig, char *sval, int str_size,
  /* vector is the old value and sval is the new */
 
  if(str_size > vec_size)
-	 min = vec_size;
+   min = vec_size;
  else
-	 min = str_size;
+   min = str_size;
 
  tprint = 0;
  for(i=0; i < min; i++, tprint++)
@@ -887,15 +887,15 @@ static void print_vector_edge(struct signal_t *sig1,
        sig2->found = TRUE;
 
        if(strcmp(sval1, sval2) != 0)
-	{
+  {
 
-	  if(sig1->type == REAL)
-	  {
+    if(sig1->type == REAL)
+    {
             print_vector_state(sig1, sig2, time1, time2, sval1, sval2, isone);
-	    return;
-	  }
+      return;
+    }
 
-	  print_signal_info(sig1, sig2, time1, time2, isone);
+    print_signal_info(sig1, sig2, time1, time2, isone);
           printf("\t");
 
           size1 = strlen(sval1);
@@ -915,18 +915,18 @@ static void print_vector_edge(struct signal_t *sig1,
           edge_space(max1, max2, FALSE);
           print_edges(sig2, sval2, size2, vsize2, 'n');
           printf("\n");
-	  return;
-	}
+    return;
+  }
    }
    else
    {
-	 char dirc;
+   char dirc;
 
-	 if(sig1->type == REAL)
-	 {
+   if(sig1->type == REAL)
+   {
             print_vector_state(sig1, sig2, time1, time2, sval1, sval2, isone);
-	    return;
-	 }
+      return;
+   }
          print_signal_info(sig1, sig2, time1, time2, isone);
          dirc = isone ? '>' : '<';
          printf("%c #%lld \t", dirc, time1);
@@ -945,7 +945,7 @@ static void print_vector_edge(struct signal_t *sig1,
          edge_space(max1, max2, FALSE);
          print_edges(sig2, sval2, size2, vsize2, dirc);
          printf("\n");
-	 return;
+   return;
   }
 }
 
@@ -964,112 +964,115 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
       switch (*line++)
       {
         /* scalar cases */
-	case '0':
-	case '1':
-	case 'z':
-	case 'Z':
-	case 'x':
-	case 'X':
-  
+  case '0':
+  case '1':
+  case 'z':
+  case 'Z':
+  case 'x':
+  case 'X':
+
+    if (extended_flagG)
+    {
       /*check if it contains '<', if true parsing the eVCD*/
       separator =strpbrk(token, "<" ); // get the separator
       if (!separator)
       {
         printf("Unknown Identifier not found '%s' in file %d '%s' on line %d\n",
-		  line, isone ? 1 : 2, fname,
-	        isone ? line_num1G : line_num2G );
-	     continue;
+      line, isone ? 1 : 2, fname,
+          isone ? line_num1G : line_num2G );
+       continue;
       } else  if(separator-line>1){
             /*it is a vector*/
             line--;
             get_token(fp, token);
             strncpy(value, line, separator-line);
-      	    *sigcode = VERILOG_ID_TO_POS(separator);
-      	    if(isone)
-      	    {
-      	       if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
-      	       {
+            *sigcode = VERILOG_ID_TO_POS(separator);
+            if(isone)
+            {
+               if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
+               {
                        printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-      		        line, isone ? 1 : 2, fname,
-      		        isone ? line_num1G : line_num2G );
-      	       continue;
-      	       }
-      	    }
-      	    else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
-      	    {
+                  line, isone ? 1 : 2, fname,
+                  isone ? line_num1G : line_num2G );
+               continue;
+               }
+            }
+            else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
+            {
                        printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-      		        line, isone ? 1 : 2, fname,
-      		        isone ? line_num1G : line_num2G );
-      		 continue;
-      	    }
-      	    return(VECTOR);
-        } 
+                  line, isone ? 1 : 2, fname,
+                  isone ? line_num1G : line_num2G );
+           continue;
+            }
+            return(VECTOR);
+        }
+    }
         /*otherwise vcd*/
           *bit = *(line-1);
           *sigcode = VERILOG_ID_TO_POS(line);
          if(isone)
          {
            if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
-	   {
+     {
              printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-		line, isone ? 1 : 2, fname,
-	        isone ? line_num1G : line_num2G );
-	     continue;
-	   }
-	 }
-	 else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
-	 {
+    line, isone ? 1 : 2, fname,
+          isone ? line_num1G : line_num2G );
+       continue;
+     }
+   }
+   else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
+   {
            printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-		line, isone ? 1 : 2, fname,
+    line, isone ? 1 : 2, fname,
                isone ? line_num1G : line_num2G );
-   	    continue;
-	 }
-	 return(SCALAR);
-	 break;
+         continue;
+   }
+   return(SCALAR);
+   break;
         /* vector or real cases */
-	case 'b':
-	case 'r':
-	    strncpy(value, line, MAXTOKSIZE);
-	    get_token(fp, token);
-	    *sigcode = VERILOG_ID_TO_POS(token);
-	    if(isone)
-	    {
-	       if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
-	       {
+  case 'b':
+  case 'r':
+      strncpy(value, line, MAXTOKSIZE);
+      get_token(fp, token);
+      *sigcode = VERILOG_ID_TO_POS(token);
+      if(isone)
+      {
+         if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
+         {
                  printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-		        line, isone ? 1 : 2, fname,
-		        isone ? line_num1G : line_num2G );
-	       continue;
-	       }
-	    }
-	    else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
-	    {
+            line, isone ? 1 : 2, fname,
+            isone ? line_num1G : line_num2G );
+         continue;
+         }
+      }
+      else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
+      {
                  printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
-		        line, isone ? 1 : 2, fname,
-		        isone ? line_num1G : line_num2G );
-		 continue;
-	    }
-	    return(VECTOR);
+            line, isone ? 1 : 2, fname,
+            isone ? line_num1G : line_num2G );
+     continue;
+      }
+      return(VECTOR);
 
         /* time change value */
-	case '#':
-	    *time = (vtime_t) atoll(line);
-	    return(TIME);
-	case '$':
-	    /* AIV 02/03/03 need to read until $end for $comment */
-	    if(!strcmp(line, "comment") || !strcmp(line, "dumpall"))
-	       read_to_end(fp);
-	    break;
+  case '#':
+      *time = (vtime_t) atoll(line);
+      return(TIME);
+  case '$':
+      /* AIV 02/03/03 need to read until $end for $comment */
+      if(!strcmp(line, "comment") || !strcmp(line, "dumpall"))
+         read_to_end(fp);
+      break;
         default:
-	    line--;
+      line--;
             printf("***ERROR Unknown token '%s' in file %d '%s' on line %d\n",
-	  	     line, isone ? 1 : 2, fname,
-		     isone ? line_num1G : line_num2G );
-	     /*FIXME shouldn't die here if possible */
-	      exit(0);
+           line, isone ? 1 : 2, fname,
+         isone ? line_num1G : line_num2G );
+       /*FIXME shouldn't die here if possible */
+        exit(0);
             continue;
-	  break;
-	}
+    break;
+  }
    }
    return(EOF);
 }
@@ -1081,20 +1084,20 @@ static void restore(FILE *fp, char *str, int size)
  char *cp;
 
  {
-	int r=ungetc(' ', fp);
-	assert(r!=EOF);
+  int r=ungetc(' ', fp);
+  assert(r!=EOF);
  }
  cp = &str[size-1];
 
  for(i =0; i< size; i++, cp--){
-	 int r=ungetc(*cp, fp);
-	 if(r==EOF){
-		 //because ungetc implementations are not required to support
-		 //more than one call of it in a row, this sort of usage is
-		 //fundamentally flawed.
-		 printf("*** ERROR Failed using ungetc.  Aborting.\n");
-		 exit(1);
- 	}
+   int r=ungetc(*cp, fp);
+   if(r==EOF){
+     //because ungetc implementations are not required to support
+     //more than one call of it in a row, this sort of usage is
+     //fundamentally flawed.
+     printf("*** ERROR Failed using ungetc.  Aborting.\n");
+     exit(1);
+   }
  }
 }
 
@@ -1148,7 +1151,7 @@ static bool_t peek_nxt_sig(FILE *fp, int sigcode1, bool_t isone)
 
 /* rewind to file and reset line count to the start of a #time */
 static void rewind_time(FILE *fp, long seek, vtime_t *time,
-  	                vtime_t treset, int *linenum, int lreset)
+                    vtime_t treset, int *linenum, int lreset)
 {
   *time = treset;
   fseek(fp, seek, SEEK_SET);
@@ -1203,8 +1206,8 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
       if(!first && peek_nxt_sig(otherfp, sigcode1, isone))
       {
           rewind_time(otherfp, seek2, &nxt_time, ltime2,
-		      isone ? &line_num2G : &line_num1G,
-		      isone ? tmpline2 : tmpline1);
+          isone ? &line_num2G : &line_num1G,
+          isone ? tmpline2 : tmpline1);
       }
 
       first = FALSE;
@@ -1222,17 +1225,17 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
       }
 
       if(!sig1->in_both)
-	    break;
+      break;
       if(sig1->found)
       {
         sig1->found = FALSE;
         sig2->found = FALSE;
         if(retval == SCALAR) sig1->state = state1;
         else{
-		if(sig1->vector){
-	       		strcpy(sig1->vector, svalue1);
-		}
-	}
+    if(sig1->vector){
+             strcpy(sig1->vector, svalue1);
+    }
+  }
         break;
      }
      /*should check to see if sig1 and sig 2 are the same type??*/
@@ -1245,15 +1248,15 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
          break;
        }
        else if(sigcode1 == sigcode2)
-	        break;
+          break;
       }
 
      if(retval == SCALAR)
      {
-	if(state_flagG)
+  if(state_flagG)
           print_scalar_state(sig1, sig2, time, nxt_time,
                                           state1, state2, isone);
-	else
+  else
           print_scalar_edge(sig1, sig2, time, nxt_time,
                                           state1, state2, isone);
         sig1->state = state1;
@@ -1263,19 +1266,19 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
         if(state_flagG)
           print_vector_state(sig1, sig2, time, nxt_time,
                                          svalue1, svalue2, isone);
-	else
+  else
           print_vector_edge(sig1, sig2, time, nxt_time,
                                           svalue1, svalue2, isone);
-	if(sig1->vector){
- 	  strcpy(sig1->vector, svalue1);
-	}
+  if(sig1->vector){
+     strcpy(sig1->vector, svalue1);
+  }
      }
     /* if isn't the same time must of scanned foward so rewind */
      if(nxt_time != time)
      {
         rewind_time(otherfp, seek2, &nxt_time, ltime2,
-		      isone ? &line_num2G : &line_num1G,
-		      isone ? tmpline2 : tmpline1);
+          isone ? &line_num2G : &line_num1G,
+          isone ? tmpline2 : tmpline1);
      }
 
     break;
@@ -1284,8 +1287,8 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
      if(isone)
      {
          rewind_time(otherfp, seek2, &nxt_time, ltime2,
-		      isone ? &line_num2G : &line_num1G,
-		      isone ? tmpline2 : tmpline1);
+          isone ? &line_num2G : &line_num1G,
+          isone ? tmpline2 : tmpline1);
      }
     if(time != 0)
        return(time);
@@ -1294,8 +1297,8 @@ static vtime_t get_time_diffs(FILE *mainfp, FILE *otherfp, char *mname,
      quit_flagG = EOF;
      return(time);
   default:
-	   continue;
-	}
+     continue;
+  }
    }
   /*FIXME should never get here emit error */
   return(time);
@@ -1314,8 +1317,8 @@ static void print_map(void)
     if(fd1_to_fd2_mapG[i] != -1)
     {
         sig = VERILOG_POS_TO_SIG2(fd1_to_fd2_mapG[i]);
-  	if(!sig || !sig->in_both) continue;
-	printf("%d %d %s\n", i, fd1_to_fd2_mapG[i], sig->signame);
+    if(!sig || !sig->in_both) continue;
+  printf("%d %d %s\n", i, fd1_to_fd2_mapG[i], sig->signame);
     }
    }
    printf("*********Second*********\n");
@@ -1324,8 +1327,8 @@ static void print_map(void)
     if(fd2_to_fd1_mapG[i] != -1)
      {
         sig = VERILOG_POS_TO_SIG1(fd2_to_fd1_mapG[i]);
-	if(!sig || !sig->in_both) continue;
-	printf("%d %d %s\n", i, fd2_to_fd1_mapG[i], sig->signame);
+  if(!sig || !sig->in_both) continue;
+  printf("%d %d %s\n", i, fd2_to_fd1_mapG[i], sig->signame);
 
      }
    }
@@ -1504,11 +1507,11 @@ static void run_diffs(FILE *fp1, FILE *fp2, char *fnam1, char *fnam2,
      if(quit_flagG)
      {
           if(get_token(fp1, token) != EOF)
-	  {
-		  printf("*****End of file hit at file 2 ('%s') time %lld quiting\n", fnam2, time2);
-		  printf("WARNING - Files have different end times\n");
-	  }
-	  break;
+    {
+      printf("*****End of file hit at file 2 ('%s') time %lld quiting\n", fnam2, time2);
+      printf("WARNING - Files have different end times\n");
+    }
+    break;
      }
    }
 
@@ -1521,10 +1524,10 @@ static void run_diffs(FILE *fp1, FILE *fp2, char *fnam1, char *fnam2,
      if(quit_flagG)
      {
           if(get_token(fp2, token) != EOF)
-	  {
-		  printf("*****End of file hit at file 1 ('%s') time %lld quiting\n", fnam1, time1);
-		  printf("WARNING - Files have different end times\n");
-	  }
+    {
+      printf("*****End of file hit at file 1 ('%s') time %lld quiting\n", fnam1, time1);
+      printf("WARNING - Files have different end times\n");
+    }
           break;
      }
     }
