@@ -21,6 +21,7 @@
 #define MAXSIG 256
 #define MAXSCOPES 100
 #define MAXTOKSIZE (1024*1024 + 1024)
+#define MAXIDLENGTH  11
 
 #define EDGE_PER_LINE 11
 #define CHAR_PER_EDGE 5
