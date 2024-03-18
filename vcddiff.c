@@ -955,6 +955,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
 {
  char *line;
  char * separator;
+ int token_length;
  static char token[MAXTOKSIZE];
 
    while(get_token(fp, token) != EOF)
@@ -1053,7 +1054,39 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
      continue;
       }
       return(VECTOR);
-
+  case 'p':
+      /*pport_value 0_strength_component 1_strength_component identifier_code*/
+      /*parsing "port_value"*/
+      strncpy(value,line,MAXTOKSIZE);
+      /*parsing "0_strength_component"*/
+      token_length=get_token(fp,token);
+      strncat(value," ",1); /* separate port value from strength */
+      strncat(value,token,token_length);
+      /*parsing "1_strength_component"*/
+      token_length=get_token(fp,token);
+      strncat(value," ",1); /* separate port value from strength */
+      strncat(value,token,token_length);
+      get_token(fp,token);
+      /*parsing "identifier_code"*/
+      *sigcode = VERILOG_ID_TO_POS(token);
+       if(isone)
+       {
+          if(VERILOG_POS_TO_SIG1(*sigcode) == NULL)
+          {
+                  printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
+             line, isone ? 1 : 2, fname,
+             isone ? line_num1G : line_num2G );
+          continue;
+          }
+       }
+       else if(VERILOG_POS_TO_SIG2(*sigcode) == NULL)
+       {
+                  printf("Unknown Identifier '%s' in file %d '%s' on line %d\n",
+             line, isone ? 1 : 2, fname,
+             isone ? line_num1G : line_num2G );
+      continue;
+       }
+      return (VECTOR) ; /*fake vector if single bit*/
         /* time change value */
   case '#':
       *time = (vtime_t) atoll(line);
@@ -1062,6 +1095,8 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
       /* AIV 02/03/03 need to read until $end for $comment */
       if(!strcmp(line, "comment") || !strcmp(line, "dumpall"))
          read_to_end(fp);
+      if (strcmp(line,"dumpports")!=0)
+         get_token(fp,token); /*skip dumpports keyword*/
       break;
         default:
       line--;
