@@ -971,6 +971,8 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
   case 'x':
   case 'X':
 
+    if (extended_flagG)
+    {
       /*check if it contains '<', if true parsing the eVCD*/
       separator =strpbrk(token, "<" ); // get the separator
       if (!separator)
@@ -1004,6 +1006,7 @@ static int get_nxt_chg(FILE *fp, char *fname, int *sigcode, int *bit,
             }
             return(VECTOR);
         }
+    }
         /*otherwise vcd*/
           *bit = *(line-1);
           *sigcode = VERILOG_ID_TO_POS(line);
