@@ -20,7 +20,7 @@
 #define FALSE 0
 #define MAXSIG 256
 #define MAXSCOPES 100
-#define MAXTOKSIZE (1024*1024 + 1024)
+#define MAXTOKSIZE (1024 * 1024 + 1024)
 
 #define EDGE_PER_LINE 11
 #define CHAR_PER_EDGE 5
@@ -59,38 +59,37 @@
 
 #define UNDEFINED 26
 
-
 /*dumpfile key words*/
 #define V_ATTRBEGIN 1
 #define V_COMMENT 2
 #define V_DATE 3
-#define V_END  4
-#define V_ENDDEF  5
-#define V_SCOPE    6
+#define V_END 4
+#define V_ENDDEF 5
+#define V_SCOPE 6
 #define V_TIMESCALE 7
-#define V_UPSCOPE  8
-#define V_VAR    9
-#define V_VERSION  10
+#define V_UPSCOPE 8
+#define V_VAR 9
+#define V_VERSION 10
 
-#  define MAX(a,b) ((a  > b ) ?  a  :  b )
+#define MAX(a, b) ((a > b) ? a : b)
 
 typedef unsigned long long vtime_t;
 typedef char bool_t;
 
 struct variable_types_t {
-         char *vnam;
-         int vnum;
+   char* vnam;
+   int vnum;
 };
 
 struct signal_t {
-    int size;
-    int type;
-    unsigned int sig_code;
-    char state;
-    char *vector;
-    char *signame;
-    char *ident;
-    bool_t found;
-    bool_t in_both;
-    struct signal_t *next;
+   int size;
+   int type;
+   unsigned int sig_code;
+   char state;
+   char* vector;
+   char* signame;
+   char* ident;
+   bool_t found;
+   bool_t in_both;
+   struct signal_t* next;
 };
