@@ -932,7 +932,7 @@ static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* valu
       case '$':
          /* AIV 02/03/03 need to read until $end for $comment */
          if (!strcmp(line, "comment") || !strcmp(line, "dumpall")) read_to_end(fp);
-         if (strcmp(line, "dumpports") != 0) get_token(fp, token); /*skip dumpports keyword*/
+         if (!strcmp(line, "dumpports") && extended_flagG) get_token(fp, token); /*skip dumpports keyword*/
          break;
       default:
          line--;
