@@ -68,6 +68,7 @@ static char curmodG[1000]; /* cur mod hier name */
 static FILE* file1G; /* to check if it is the first file */
 static bool_t state_flagG; /* print edges or states */
 static bool_t wrap_flagG; /* print edges or states */
+static bool_t extended_flagG; /* parse extended VCD format */
 static struct signal_t** sig_int1G; /* int codes for file 1 */
 static struct signal_t** sig_int2G; /* int codes for file 2 */
 static int* fd1_to_fd2_mapG; /* mappings from one file to the other*/
@@ -81,17 +82,21 @@ struct signal_t* sig2_hdG; /* the head of the second file of signals */
 struct signal_t* lastsigG; /* mark the last signal of the file */
 
 /* signal to code from dinotrace wave viewer www.veripool.org/dinotrace */
+/*extended vcd converted, removes '<' */
 #define VERILOG_ID_TO_POS(_code_) \
-   (_code_[0] \
-       ? ((_code_[0] - 32) \
-          + 94 \
-               * (_code_[1] ? ((_code_[1] - 32) \
-                               + 94 \
-                                    * (_code_[2] ? ((_code_[2] - 32) \
-                                                    + 94 * (_code_[3] ? ((_code_[3] - 32)) : 0)) \
-                                                 : 0)) \
-                            : 0)) \
-       : 0)
+   strpbrk(_code_, "<") && extended_flagG \
+      ? atoi(_code_ + 1) \
+      : (_code_[0] \
+            ? ((_code_[0] - 32) \
+               + 94 \
+                    * (_code_[1] \
+                          ? ((_code_[1] - 32) \
+                             + 94 \
+                                  * (_code_[2] ? ((_code_[2] - 32) \
+                                                  + 94 * (_code_[3] ? ((_code_[3] - 32)) : 0)) \
+                                               : 0)) \
+                          : 0)) \
+            : 0)
 
 #define VERILOG_POS_TO_SIG1(_pos_) \
    (((unsigned)(_pos_) < (unsigned)max_codeG) ? sig_int1G[(_pos_)] : 0)
@@ -309,7 +314,7 @@ static int get_var_type(char* tstr) {
 /*var line so add a new signal with its identifier*/
 static void variable(FILE* fp, char* file_name) {
    char signame[MAXSIG];
-   char ident[11];
+   char ident[MAXIDLENGTH];
    static char token[MAXTOKSIZE];
    int bits;
    char type;
@@ -332,7 +337,16 @@ static void variable(FILE* fp, char* file_name) {
       type = UNDEFINED;
       printf("Error- Unknown variable type %s\n", token);
    }
+   /*according to the std ieee verilog
+     if it is port is an evcd (port not allowed in vcd for signal declaration)
+   */
+   if (extended_flagG == FALSE && strncmp(token, "port", 4) == 0) {
+      extended_flagG = TRUE;
 
+   } else if (extended_flagG && strncmp(token, "port", 4) != 0) {
+      /*parsing an evcd file but encountered in a non standard definition*/
+      printf("Error - Unknown variable type for EVCD standard %s\n", token);
+   }
    /* get number of bits */
    /* AIV FIXME error recovery should be used here for invalid tokens
     * if a $var line is short vars (starts with a '$') rewind, print
@@ -809,22 +823,52 @@ static void print_vector_edge(struct signal_t* sig1, struct signal_t* sig2, vtim
 static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* value, vtime_t* time,
                        bool_t isone) {
    char* line;
+   char* separator;
+   int token_length;
    static char token[MAXTOKSIZE];
 
    while (get_token(fp, token) != EOF) {
       line = token;
 
       switch (*line++) {
-      /* scalar cases */
+         /* scalar cases */
       case '0':
       case '1':
       case 'z':
       case 'Z':
       case 'x':
       case 'X':
+
+         if (extended_flagG) {
+            /*check if it contains '<', if true parsing the eVCD*/
+            separator = strpbrk(token, "<");  // get the separator
+            if (!separator) {
+               printf("Unknown Identifier not found '%s' in file %d '%s' on line %d\n", line,
+                      isone ? 1 : 2, fname, isone ? line_num1G : line_num2G);
+               continue;
+            } else if (separator - line > 1) {
+               /*it is a vector*/
+               line--;
+               get_token(fp, token);
+               strncpy(value, line, separator - line);
+               *sigcode = VERILOG_ID_TO_POS(separator);
+               if (isone) {
+                  if (VERILOG_POS_TO_SIG1(*sigcode) == NULL) {
+                     printf("Unknown Identifier '%s' in file %d '%s' on line %d\n", line,
+                            isone ? 1 : 2, fname, isone ? line_num1G : line_num2G);
+                     continue;
+                  }
+               } else if (VERILOG_POS_TO_SIG2(*sigcode) == NULL) {
+                  printf("Unknown Identifier '%s' in file %d '%s' on line %d\n", line,
+                         isone ? 1 : 2, fname, isone ? line_num1G : line_num2G);
+                  continue;
+               }
+               return (VECTOR);
+            }
+         }
+         /*otherwise vcd*/
          *bit = *(line - 1);
          *sigcode = VERILOG_ID_TO_POS(line);
-
          if (isone) {
             if (VERILOG_POS_TO_SIG1(*sigcode) == NULL) {
                printf("Unknown Identifier '%s' in file %d '%s' on line %d\n", line, isone ? 1 : 2,
@@ -838,7 +882,7 @@ static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* valu
          }
          return (SCALAR);
          break;
-      /* vector or real cases */
+         /* vector or real cases */
       case 'b':
       case 'r':
          strncpy(value, line, MAXTOKSIZE);
@@ -856,12 +900,40 @@ static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* valu
             continue;
          }
          return (VECTOR);
-
-      /* time change value */
+      case 'p':
+         /*pport_value 0_strength_component 1_strength_component identifier_code*/
+         /*parsing "port_value"*/
+         strncpy(value, line, MAXTOKSIZE);
+         /*parsing "0_strength_component"*/
+         token_length = get_token(fp, token);
+         strncat(value, " ", 1); /* separate port value from strength */
+         strncat(value, token, token_length);
+         /*parsing "1_strength_component"*/
+         token_length = get_token(fp, token);
+         strncat(value, " ", 1); /* separate port value from strength */
+         strncat(value, token, token_length);
+         get_token(fp, token);
+         /*parsing "identifier_code"*/
+         *sigcode = VERILOG_ID_TO_POS(token);
+         if (isone) {
+            if (VERILOG_POS_TO_SIG1(*sigcode) == NULL) {
+               printf("Unknown Identifier '%s' in file %d '%s' on line %d\n", line, isone ? 1 : 2,
+                      fname, isone ? line_num1G : line_num2G);
+               continue;
+            }
+         } else if (VERILOG_POS_TO_SIG2(*sigcode) == NULL) {
+            printf("Unknown Identifier '%s' in file %d '%s' on line %d\n", line, isone ? 1 : 2,
+                   fname, isone ? line_num1G : line_num2G);
+            continue;
+         }
+         return (VECTOR); /*fake vector if single bit*/
+         /* time change value */
       case '#': *time = (vtime_t)atoll(line); return (TIME);
       case '$':
          /* AIV 02/03/03 need to read until $end for $comment */
          if (!strcmp(line, "comment") || !strcmp(line, "dumpall")) read_to_end(fp);
+         if (!strcmp(line, "dumpports") && extended_flagG)
+            get_token(fp, token); /*skip dumpports keyword*/
          break;
       default:
          line--;
@@ -1307,6 +1379,7 @@ int main(int argc, char** argv) {
    bool_t map_found;
    FILE *fp1, *fp2;
 
+   extended_flagG = FALSE;
    quit_flagG = FALSE;
    sig1_hdG = NULL;
    sig2_hdG = NULL;
