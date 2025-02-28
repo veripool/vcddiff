@@ -978,6 +978,7 @@ static bool_t peek_nxt_sig(FILE* fp, int sigcode1, bool_t isone) {
    char* cp;
 
    size1 = get_token(fp, tmp);
+   if (size1 == EOF) return (TRUE);
    cp = tmp;
 
    if (tmp[0] == 'b') {
