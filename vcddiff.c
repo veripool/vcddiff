@@ -37,7 +37,7 @@ static void add_signal(char*, char*, unsigned int, int, int);
 static int get_var_type(char*);
 static void variable(FILE*, char*);
 static void alloc_sig_mem(void);
-static int get_vkeywrd(register char*);
+static int get_vkeywrd(char*);
 static long get_lines(FILE*, int*, int*, char*);
 static void print_signal_info(struct signal_t*, struct signal_t*, vtime_t, vtime_t, bool_t);
 static void print_scalar_state(struct signal_t*, struct signal_t*, vtime_t, vtime_t, char, char,
@@ -295,7 +295,7 @@ static struct variable_types_t var_types[]
 
 static int get_var_type(char* tstr) {
    int l, h;
-   register int m, cv;
+   int m, cv;
 
    l = 0;
    h = VARTYPE - 1;
@@ -425,9 +425,9 @@ static struct variable_types_t vkeywds[]
 #define VKEYWDS (sizeof(vkeywds) / sizeof(struct variable_types_t))
 
 /*search for verilog keywords*/
-static int get_vkeywrd(register char* tstr) {
+static int get_vkeywrd(char* tstr) {
    int l, h;
-   register int m, cv;
+   int m, cv;
 
    //start at $end
    l = -2;
@@ -452,7 +452,7 @@ static int get_vkeywrd(register char* tstr) {
 static long get_lines(FILE* fp, int* units, int* tnum, char* file_name) {
    char sep[2];
    int level;
-   register int i;
+   int i;
    char* tok;
 
    //1+because of the line with "tok++", which would otherwise make the buffer
@@ -574,7 +574,7 @@ static void print_scalar_state(struct signal_t* sig1, struct signal_t* sig2, vti
 static void print_vector_state(struct signal_t* sig1, struct signal_t* sig2, vtime_t time1,
                                vtime_t time2, char* sval1, char* sval2, bool_t isone) {
    int size1, size2;
-   register int i;
+   int i;
 
    size1 = strlen(sval1);
    size2 = strlen(sval2);
@@ -663,7 +663,7 @@ static void print_scalar_edge(struct signal_t* sig1, struct signal_t* sig2, vtim
 */
 static void print_edges(struct signal_t* sig, char* sval, int str_size, int vec_size,
                         char searchc) {
-   register int i;
+   int i;
    int min, tprint;
 
    /*AIV 02/06/03 the print edges were wrong for different sizes */
@@ -721,7 +721,7 @@ static void print_edges(struct signal_t* sig, char* sval, int str_size, int vec_
 
 /* add space so the vector edge valued line up correctly */
 static void edge_space(int size1, int size2, bool_t is_sigone) {
-   register int i, r, diff;
+   int i, r, diff;
 
    if (size1 == size2) return;
    if (is_sigone && size2 > size1) {
@@ -906,11 +906,11 @@ static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* valu
          strncpy(value, line, MAXTOKSIZE);
          /*parsing "0_strength_component"*/
          token_length = get_token(fp, token);
-         strncat(value, " ", 1); /* separate port value from strength */
+         strncat(value, " ", 2); /* separate port value from strength */
          strncat(value, token, token_length);
          /*parsing "1_strength_component"*/
          token_length = get_token(fp, token);
-         strncat(value, " ", 1); /* separate port value from strength */
+         strncat(value, " ", 2); /* separate port value from strength */
          strncat(value, token, token_length);
          get_token(fp, token);
          /*parsing "identifier_code"*/
@@ -1135,7 +1135,7 @@ static vtime_t get_time_diffs(FILE* mainfp, FILE* otherfp, char* mname, char* on
 
 /* print the map of identifiers to signal name between files */
 static void print_map(void) {
-   register int i;
+   int i;
    struct signal_t* sig;
 
    for (i = 0; i < max_codeG; i++) {

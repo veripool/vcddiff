@@ -78,7 +78,7 @@ typedef unsigned long long vtime_t;
 typedef char bool_t;
 
 struct variable_types_t {
-   char* vnam;
+   const char* vnam;
    int vnum;
 };
 
