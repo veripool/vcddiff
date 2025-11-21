@@ -17,6 +17,7 @@ fi
 ! ./vcddiff tests/counter.vcd tests/counter.change_reorder.no_diff.vcd | grep -q .
 ! ./vcddiff tests/counter.vcd tests/counter.var_reorder.no_diff.vcd | grep -q .
 ! ./vcddiff tests/counter.vcd tests/counter.identifier.no_diff.vcd | grep -q .
+! ./vcddiff tests/counter.vcd tests/counter.scope_move.no_diff.vcd | grep -q .
 if [ "$FIFO_SUPPORTED" = "1" ]; then
   ! ./vcddiff <(cat tests/counter.vcd) <(cat tests/counter.vcd) | grep -q .
 fi
