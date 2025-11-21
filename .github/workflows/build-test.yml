@@ -1,0 +1,42 @@
+---
+# DESCRIPTION: Github actions config
+# SPDX-License-Identifier: GPL-3.0
+# Copyright 2025 Wilson Snyder
+
+name: build-test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # weekly
+
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, cc: clang}
+          - {os: ubuntu-24.04, cc: gcc}
+          - {os: ubuntu-22.04, cc: clang}
+          - {os: ubuntu-22.04, cc: gcc}
+          - {os: macos-15, cc: clang}
+          - {os: macos-15, cc: gcc}
+          - {os: windows-2025, cc: gcc}
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        if: runner.os != 'Windows'
+        run: make
+      - name: build
+        if: runner.os == 'Windows'
+        run: make vcddiff
+      - name: test
+        shell: bash
+        run: ci/test.sh

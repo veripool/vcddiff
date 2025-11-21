@@ -25,10 +25,7 @@ http://verilator.org/verilator
 
 This version is currently intended to only provide the minimum functions
 needed for Verilator testing and remains as close to the original as
-possible.  Other applications will probably want a more full-featured
-version of vcddiff, see e.g.
-
-https://github.com/palmer-dabbelt/vcddiff
+possible.
 
 =head1 INSTALLATION
 

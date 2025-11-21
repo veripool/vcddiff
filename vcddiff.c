@@ -369,8 +369,9 @@ static void variable(FILE* fp, char* file_name) {
    /*identifier*/
    get_token(fp, token);
 
-   bzero(
+   memset(
       ident,
+      0,
       sizeof(ident));  //ensure that ident is null-terminated, even it is too long to fit in ident
    strncpy(ident, token, sizeof(ident) - 1);
 
@@ -384,7 +385,7 @@ static void variable(FILE* fp, char* file_name) {
 
    /*variable name*/
    get_token(fp, token);
-   bzero(signame, MAXSIG);
+   memset(signame, 0, MAXSIG);
    strncpy(signame, curmodG, MAXSIG - 1);
    {
       int available = MAXSIG - 1 - strlen(signame);
