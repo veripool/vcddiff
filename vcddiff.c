@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <time.h>
@@ -1374,12 +1375,94 @@ static void set_options(int argc, char** argv) {
    }
 }
 
+/* handle non-seekable files (e.g. FIFOs) */
+static FILE* open_seekable(const char* filename, char** buffered_data) {
+   struct stat st;
+   int fd = -1;
+   size_t buffer_size = 4096, total_read = 0;
+   char* buffer = NULL;
+   FILE* fp;
+
+   if ((fp = fopen(filename, "r")) == NULL) {
+      printf("*** ERROR-opening file %s\n", filename);
+      exit(1);
+   }
+
+   *buffered_data = NULL;
+
+#ifdef _WIN32
+   return fp;
+#else
+   fd = fileno(fp);
+   if (fstat(fd, &st) != 0) {
+      printf("*** ERROR-cannot stat file %s\n", filename);
+      exit(1);
+   }
+
+   if (S_ISREG(st.st_mode)) {
+      return fp;
+   }
+
+   buffer = malloc(buffer_size);
+
+   if (!buffer) {
+      printf("*** ERROR-cannot allocate memory for buffering %s\n", filename);
+      exit(1);
+   }
+
+   /* read entire file into memory */
+   while (1) {
+      size_t bytes_read;
+
+      bytes_read = fread(buffer + total_read, 1, buffer_size - total_read, fp);
+      total_read += bytes_read;
+
+      if (bytes_read == 0) {
+         if (feof(fp)) {
+            break;
+         }
+         if (ferror(fp)) {
+            printf("*** ERROR-reading from %s\n", filename);
+            free(buffer);
+            exit(1);
+         }
+      }
+
+      if (total_read >= buffer_size - 1) {
+         char* new_buffer;
+
+         buffer_size *= 2;
+         new_buffer = realloc(buffer, buffer_size);
+         if (!new_buffer) {
+            printf("*** ERROR-cannot allocate memory for buffering %s\n", filename);
+            free(buffer);
+            exit(1);
+         }
+         buffer = new_buffer;
+      }
+   }
+
+   fclose(fp);
+
+   fp = fmemopen(buffer, total_read, "r");
+   if (!fp) {
+      printf("*** ERROR-cannot create memory stream for %s\n", filename);
+      free(buffer);
+      exit(1);
+   }
+
+   *buffered_data = buffer;
+   return fp;
+#endif
+}
+
 int main(int argc, char** argv) {
    int unit1, unit2, tnum1, tnum2;
    long start1, start2;
    char *file_nam1, *file_nam2;
    bool_t map_found;
    FILE *fp1, *fp2;
+   char *buffer1 = NULL, *buffer2 = NULL;
 
    extended_flagG = FALSE;
    quit_flagG = FALSE;
@@ -1402,18 +1485,13 @@ int main(int argc, char** argv) {
 
    wrap_flagG = state_flagG = FALSE;
 
-   if ((fp1 = fopen(argv[argc - 2], "r")) == NULL) {
-      printf("*** ERROR-opening file %s\n", argv[argc - 2]);
-      exit(1);
-   }
+   fp1 = open_seekable(argv[argc - 2], &buffer1);
 
    /* set first file to the global pointer to check the line count */
    file1G = fp1;
 
-   if ((fp2 = fopen(argv[argc - 1], "r")) == NULL) {
-      printf("*** ERROR-opening file %s\n", argv[argc - 1]);
-      exit(1);
-   }
+   fp2 = open_seekable(argv[argc - 1], &buffer2);
+
    set_options(argc, argv);
 
    sig_int1G = NULL;
@@ -1456,5 +1534,7 @@ int main(int argc, char** argv) {
    free(fd2_to_fd1_mapG);
    fclose(fp1);
    fclose(fp2);
+   if (buffer1) free(buffer1);
+   if (buffer2) free(buffer2);
    return (0);
 }
