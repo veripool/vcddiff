@@ -1261,16 +1261,18 @@ static bool_t map(char* file_nam1, char* file_nam2, int* file_map, struct signal
 
 /* map both files */
 static bool_t map_var_names(char* file_nam1, char* file_nam2) {
+   bool_t one_found1, one_found2;
+
    fd1_to_fd2_mapG = (int*)malloc(sizeof(int) * max_codeG);
    for (int i = 0; i < max_codeG; i++) fd1_to_fd2_mapG[i] = -1;
 
    fd2_to_fd1_mapG = (int*)malloc(sizeof(int) * max_codeG);
    for (int i = 0; i < max_codeG; i++) fd2_to_fd1_mapG[i] = -1;
 
+   one_found1 = map(file_nam1, file_nam2, fd1_to_fd2_mapG, sig1_hdG, sig2_hdG, sig_int1G, TRUE);
+   one_found2 = map(file_nam2, file_nam1, fd2_to_fd1_mapG, sig2_hdG, sig1_hdG, sig_int2G, FALSE);
    if (0) { print_map(); }
-
-   map(file_nam1, file_nam2, fd1_to_fd2_mapG, sig1_hdG, sig2_hdG, sig_int1G, TRUE);
-   return (map(file_nam2, file_nam1, fd2_to_fd1_mapG, sig2_hdG, sig1_hdG, sig_int2G, FALSE));
+   return one_found1 && one_found2;
 }
 
 /* acutally run the files to diff the two */
