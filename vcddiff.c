@@ -399,6 +399,11 @@ static void variable(FILE* fp, char* file_name) {
    if (token[0] != '$') {
       int available = MAXSIG - 1 - strlen(signame);
       if (available > 0) { strncat(signame, token, available); }
+      get_token(fp, token);
+      if (token[0] != '$') {
+         printf("ERROR - missing $end for %s\n", signame);
+         exit(1);
+      }
    }
 
    add_signal(signame, ident, VERILOG_ID_TO_POS(ident), bits, type);
@@ -447,22 +452,34 @@ static int get_vkeywrd(char* tstr) {
    return (EOF);
 }
 
+static void make_curmod(int level) {
+   char sep[2];
+   int i;
+
+   sep[0] = '.';
+   sep[1] = '\0';
+
+   strcpy(curmodG, scopesG[0]);
+   strcat(curmodG, sep);
+
+   for (i = 1; i < level; i++) {
+      strcat(curmodG, scopesG[i]);
+      strcat(curmodG, sep);
+   }
+}
+
 /* process all the lines until $enddef is reached, determines all variable
  * names, seperated by a '.' between scopes, place the timescale number
  * and units, and return the file location to start processing diffs
  */
 static long get_lines(FILE* fp, int* units, int* tnum, char* file_name) {
-   char sep[2];
    int level;
-   int i;
    char* tok;
 
    //1+because of the line with "tok++", which would otherwise make the buffer
    //smaller than expected by get_token
    static char token[MAXTOKSIZE + 1];
 
-   sep[0] = '.';
-   sep[1] = '\0';
    level = 0;
    *units = 1;
    *tnum = 1;
@@ -483,6 +500,7 @@ static long get_lines(FILE* fp, int* units, int* tnum, char* file_name) {
 
       case V_UPSCOPE:
          if (level > 0) level--;
+         make_curmod(level);
          break;
 
       case V_SCOPE:
@@ -491,18 +509,8 @@ static long get_lines(FILE* fp, int* units, int* tnum, char* file_name) {
 
          if (level < MAXSCOPES) {
             strcpy(scopesG[level], tok);
-
-            strcpy(curmodG, scopesG[0]);
-            strcat(curmodG, sep);
             level++;
-
-            if (level) {
-               for (i = 1; i < level; i++) {
-                  strcat(curmodG, scopesG[i]);
-                  strcat(curmodG, sep);
-               }
-            }
-
+            make_curmod(level);
          } else {
             printf("*** ERROR-exceeded max scope levels %d\n", level);
             exit(0);
