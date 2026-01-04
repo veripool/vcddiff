@@ -279,6 +279,7 @@ static struct variable_types_t var_types[]
       {"realtime", REALTIME},  // GTKWave's fst2vcd
       {"reg", REG},
       {"shortint", SHORTINT},  // GTKWave's fst2vcd
+      {"string", STRING},  // GTKWave's fst2vcd
       {"supply0", SUPPLY0},
       {"supply1", SUPPLY1},
       {"time", TIME},
@@ -892,9 +893,10 @@ static int get_nxt_chg(FILE* fp, char* fname, int* sigcode, int* bit, char* valu
          }
          return (SCALAR);
          break;
-         /* vector or real cases */
+         /* vector, real, or string cases */
       case 'b':
       case 'r':
+      case 's':
          strncpy(value, line, MAXTOKSIZE);
          get_token(fp, token);
          *sigcode = VERILOG_ID_TO_POS(token);

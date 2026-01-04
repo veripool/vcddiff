@@ -45,20 +45,21 @@
 #define REALTIME 11
 #define REG 12
 #define SHORTINT 13
-#define SUPPLY0 14
-#define SUPPLY1 15
-#define TIME 16
-#define TRI 17
-#define TRI0 18
-#define TRI1 19
-#define TRIAND 20
-#define TRIOR 21
-#define TRIREG 22
-#define WAND 23
-#define WIRE 24
-#define WOR 25
+#define STRING 14
+#define SUPPLY0 15
+#define SUPPLY1 16
+#define TIME 17
+#define TRI 18
+#define TRI0 19
+#define TRI1 20
+#define TRIAND 21
+#define TRIOR 22
+#define TRIREG 23
+#define WAND 24
+#define WIRE 25
+#define WOR 26
 
-#define UNDEFINED 26
+#define UNDEFINED 27
 
 /*dumpfile key words*/
 #define V_ATTRBEGIN 1
