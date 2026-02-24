@@ -1,23 +1,21 @@
-/* Copyright (c) 1991-2004 Pragmatic C Software Corp. */
+// SPDX-FileCopyrightText: 1991-2004 Pragmatic C Software Corp.
+// SPDX-FileCopyrightText: 2015-2026 Wilson Snyder
+// SPDX-License-Identifier: GPL-3.0
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3 of the License, or (at your
+// option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA, 02111-1307.
 
-/*
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the
-  Free Software Foundation; either version 3 of the License, or (at your
-  option) any later version.
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write to the Free Software Foundation, Inc.,
-  59 Temple Place, Suite 330, Boston, MA, 02111-1307.
-*/
-
-#define TRUE 1
-#define FALSE 0
 #define MAXSIG 256
 #define MAXSCOPES 100
 #define MAXTOKSIZE (1024 * 1024 + 1024)
@@ -30,7 +28,7 @@
 #define VECTOR 1
 #define REALSIZE 60
 
-/*var types*/
+// var types
 #define BIT 0
 #define BYTE 1
 #define EVENT 2
@@ -60,7 +58,7 @@
 
 #define UNDEFINED 26
 
-/*dumpfile key words*/
+// dumpfile key words
 #define V_ATTRBEGIN 1
 #define V_COMMENT 2
 #define V_DATE 3
@@ -75,7 +73,6 @@
 #define MAX(a, b) ((a > b) ? a : b)
 
 typedef unsigned long long vtime_t;
-typedef char bool_t;
 
 struct variable_types_t {
    const char* vnam;
@@ -90,7 +87,7 @@ struct signal_t {
    char* vector;
    char* signame;
    char* ident;
-   bool_t found;
-   bool_t in_both;
-   struct signal_t* next;
+   bool found;
+   bool in_both;
+   signal_t* next;
 };
