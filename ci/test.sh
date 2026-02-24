@@ -35,4 +35,11 @@ if [ "$FIFO_SUPPORTED" = "1" ]; then
       grep "Files have different end times"
 fi
 
+./vcddiff --version |
+    grep "vcddiff"
+./vcddiff -v |
+    grep "vcddiff"
+./vcddiff -V |
+    grep "vcddiff"
+
 echo "== Tests passed"

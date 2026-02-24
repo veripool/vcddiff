@@ -16,8 +16,7 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA, 02111-1307.
 
-#define VERS2 "0.04c-veripool"
-#define OFDT "07/28/2004"
+#define VERSION "2026-02-23-veripool"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1276,9 +1275,11 @@ static void run_diffs(FILE* fp1, FILE* fp2, char* fnam1, char* fnam2, long start
    }
 }
 
+static void print_version() { printf("%s_%s (%s).\n", "vcddiff", VERSION, "Linux-ELF"); }
+
 // print help information
 static void print_help() {
-   printf("Usage: [options] 'file1' 'file2'\n Compares Verilog VCD dump files.\n\n");
+   print_version();
 
    printf(" --state \n -s \n");
    printf("\tPrints the current state of variables, instead of\n \tthe default edge value. \n");
@@ -1293,7 +1294,7 @@ static void print_help() {
 
 // print program header info
 static void print_header() {
-   printf("%s_%s of %s (%s).\n", "vcddiff", VERS2, OFDT, "Linux-ELF");
+   print_version();
    printf("Copyright (c) 2002-2004 Pragmatic C Software Corp.\n");
    printf("All Rights reserved.  Licensed under the GNU General Public License (GPL).\n");
    printf("See the 'COPYING' file for details.  NO WARRANTY provided.\n");
@@ -1423,6 +1424,10 @@ int main(int argc, char** argv) {
       exit(1);
    }
    if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) print_help();
+   if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v") || !strcmp(argv[1], "-V")) {
+      print_version();
+      exit(0);
+   }
 
    if (argc < 3) {
       printf("ERROR - Usage: [options] 'file1' 'file2'\n");
