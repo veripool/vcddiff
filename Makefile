@@ -29,3 +29,6 @@ clean distclean:
 
 format:
 	$(CLANGFORMAT) $(CLANGFORMAT_FLAGS) *.c *.h
+
+test: vcddiff
+	ci/test.sh

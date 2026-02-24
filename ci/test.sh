@@ -34,3 +34,5 @@ if [ "$FIFO_SUPPORTED" = "1" ]; then
   ./vcddiff <(cat tests/counter.vcd) <(cat tests/counter.end_time.diff.vcd) |
       grep "Files have different end times"
 fi
+
+echo "== Tests passed"
