@@ -371,8 +371,7 @@ static void variable(FILE* fp, char* file_name) {
    get_token(fp, token);
 
    memset(
-      ident,
-      0,
+      ident, 0,
       sizeof(ident));  //ensure that ident is null-terminated, even it is too long to fit in ident
    strncpy(ident, token, sizeof(ident) - 1);
 
@@ -1409,11 +1408,9 @@ static FILE* open_seekable(const char* filename, char** buffered_data) {
       exit(1);
    }
 
-   if (S_ISREG(st.st_mode)) {
-      return fp;
-   }
+   if (S_ISREG(st.st_mode)) { return fp; }
 
-   buffer = malloc(buffer_size);
+   buffer = static_cast<char*>(malloc(buffer_size));
 
    if (!buffer) {
       printf("*** ERROR-cannot allocate memory for buffering %s\n", filename);
@@ -1428,9 +1425,7 @@ static FILE* open_seekable(const char* filename, char** buffered_data) {
       total_read += bytes_read;
 
       if (bytes_read == 0) {
-         if (feof(fp)) {
-            break;
-         }
+         if (feof(fp)) { break; }
          if (ferror(fp)) {
             printf("*** ERROR-reading from %s\n", filename);
             free(buffer);
@@ -1442,7 +1437,7 @@ static FILE* open_seekable(const char* filename, char** buffered_data) {
          char* new_buffer;
 
          buffer_size *= 2;
-         new_buffer = realloc(buffer, buffer_size);
+         new_buffer = static_cast<char*>(realloc(buffer, buffer_size));
          if (!new_buffer) {
             printf("*** ERROR-cannot allocate memory for buffering %s\n", filename);
             free(buffer);
