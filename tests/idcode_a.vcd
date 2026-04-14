@@ -1,0 +1,19 @@
+$timescale 1ps $end
+$scope module m $end
+$scope module s0 $end
+$var wire 1 ! a $end
+$var wire 1 " b $end
+$upscope $end
+$scope module s1 $end
+$var wire 1 # e $end
+$var wire 1 ! c $end
+$var wire 1 " d $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0#
+1"
+0!
+$end
