@@ -1,0 +1,21 @@
+$timescale 1ps $end
+$scope module m $end
+$scope module s0 $end
+$var wire 1 0 a $end
+$var wire 1 1 b $end
+$upscope $end
+$scope module s1 $end
+$var wire 1 2 e $end
+$var wire 1 3 c $end
+$var wire 1 4 d $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+14
+03
+02
+11
+00
+$end
